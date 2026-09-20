@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Vendor price data is personal-use licensed: cached locally, never committed.
+# Leading slash: this is the repo-root data directory, not src/riskkit/data.
+/data/
+*.parquet
+
+# Generated report output
+docs/index.html

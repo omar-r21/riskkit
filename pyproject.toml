@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riskkit"
+version = "0.1.0"
+description = "Value-at-risk and expected-shortfall model validation, risk attribution and stress testing"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Omar Rayan" }]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scipy>=1.11",
+    "pandas-market-calendars>=4.4",
+    "pyyaml>=6.0",
+    "pyarrow>=15.0",
+]
+
+[project.optional-dependencies]
+yahoo = ["yfinance>=0.2.40"]
+plot = ["matplotlib>=3.8"]
+dev = ["pytest>=7.4", "matplotlib>=3.8", "yfinance>=0.2.40"]
+
+[project.scripts]
+riskkit = "riskkit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

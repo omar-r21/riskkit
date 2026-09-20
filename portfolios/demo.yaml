@@ -1,0 +1,18 @@
+name: demo
+description: >
+  Broad asset-class building blocks at fixed weights, rebalanced daily. Chosen for
+  coverage of equity, duration, credit and real assets - never for past performance,
+  so the published results carry no hindsight in the selection. This is a
+  hypothetical portfolio used to test risk models, not a track record and not
+  anybody's holdings.
+weights:
+  SPY: 0.25   # US large cap
+  QQQ: 0.10   # US large cap growth
+  IWM: 0.05   # US small cap
+  EFA: 0.10   # developed international
+  EEM: 0.05   # emerging markets
+  TLT: 0.10   # long Treasuries
+  IEF: 0.15   # intermediate Treasuries
+  LQD: 0.10   # investment grade credit
+  GLD: 0.05   # gold
+  VNQ: 0.05   # US real estate
