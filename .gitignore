@@ -7,6 +7,3 @@ __pycache__/
 # Leading slash: this is the repo-root data directory, not src/riskkit/data.
 /data/
 *.parquet
-
-# Generated report (rebuild with: riskkit report)
-docs/index.html
