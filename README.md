@@ -94,6 +94,18 @@ riskkit report --weights mine.yaml    # any portfolio
 pytest                                # 71 tests, no network
 ```
 
+## Where it runs
+
+The published report uses the demo portfolio, which exists so the models have a realistic multi-asset
+return series to be tested on without anyone's holdings being involved.
+
+I also run it nightly against my own brokerage account, from a private app that feeds it live positions
+and displays the output — forecast against realised losses, which positions drive the risk, how the book
+would have fared through 2008 and 2020. That app is private because it reads a real account; the
+analytics are here because they're general and contain no personal data.
+[Write-up of that side](https://github.com/omar-r21/portfolio-intelligence-case-study), including what it
+replaced: a language model producing buy/sell calls with invented confidence percentages.
+
 ## Still to come
 
 Fama-French factor regression with HAC standard errors, historical stress replays (2008, COVID, 2022),
