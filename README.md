@@ -5,6 +5,8 @@
 Does your value-at-risk model actually work? This runs four of them side by side over twenty years of
 daily data and scores them with the tests that answer that question.
 
+**[See the report it produces →](https://omar-r21.github.io/riskkit/)**
+
 ```bash
 pip install -e .
 riskkit report --weights portfolios/demo.yaml --out docs/index.html
