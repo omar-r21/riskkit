@@ -8,5 +8,5 @@ __pycache__/
 /data/
 *.parquet
 
-# Generated report output
+# Generated report (rebuild with: riskkit report)
 docs/index.html
