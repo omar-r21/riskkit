@@ -58,26 +58,42 @@ def test_align_rejects_an_empty_frame():
         align(pd.DataFrame())
 
 
+# The panel ends in 2025, so every call pins `end` to its last session: otherwise
+# the freshness check correctly reports the cache as missing later sessions.
+AS_OF = "2025-12-31"
+
+
 def test_prices_are_cached_and_refetched_only_on_demand(price_panel, tmp_path):
     source = FakeSource(price_panel)
-    first = load_prices(["AAA", "BBB"], start="2015-01-02", source=source, cache_dir=tmp_path)
+    first = load_prices(["AAA", "BBB"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
     assert source.calls == [["AAA", "BBB"]]
 
-    second = load_prices(["AAA", "BBB"], start="2015-01-02", source=source, cache_dir=tmp_path)
+    second = load_prices(["AAA", "BBB"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
     assert source.calls == [["AAA", "BBB"]]  # served from cache
     pd.testing.assert_frame_equal(first, second)
 
-    load_prices(["AAA", "CCC"], start="2015-01-02", source=source, cache_dir=tmp_path)
+    load_prices(["AAA", "CCC"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
     assert source.calls[-1] == ["CCC"]  # only the new ticker
 
-    load_prices(["AAA"], start="2015-01-02", source=source, cache_dir=tmp_path, refresh=True)
+    load_prices(["AAA"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path, refresh=True)
     assert source.calls[-1] == ["AAA"]
+
+
+def test_a_cache_missing_recent_sessions_is_refetched(price_panel, tmp_path):
+    """The trap this catches: a cache written before today's close, served all day."""
+    source = FakeSource(price_panel)
+    load_prices(["AAA"], start="2015-01-02", end="2020-06-30", source=source, cache_dir=tmp_path)
+    assert source.calls == [["AAA"]]
+
+    # Asking as of a later date: the stored file stops short, so it must be refetched.
+    load_prices(["AAA"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
+    assert source.calls == [["AAA"], ["AAA"]]
 
 
 def test_cache_is_refetched_when_it_starts_too_late(price_panel, tmp_path):
     source = FakeSource(price_panel)
-    load_prices(["AAA"], start="2020-01-02", source=source, cache_dir=tmp_path)
-    load_prices(["AAA"], start="2015-01-02", source=source, cache_dir=tmp_path)
+    load_prices(["AAA"], start="2020-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
+    load_prices(["AAA"], start="2015-01-02", end=AS_OF, source=source, cache_dir=tmp_path)
     assert source.calls == [["AAA"], ["AAA"]]  # cache didn't reach back far enough
 
 

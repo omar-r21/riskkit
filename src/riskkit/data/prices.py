@@ -99,6 +99,27 @@ def _cache_path(source: str, ticker: str, cache_dir: Path) -> Path:
     return cache_dir / source / f"{ticker.upper()}.parquet"
 
 
+def _last_expected_session(end: str | None = None) -> pd.Timestamp | None:
+    """The most recent exchange session whose close should be published by now.
+
+    Vendors publish a session's close within a few hours of it ending, so a cache
+    is treated as current only if it reaches this date. Before the close, that is
+    the previous session; a few hours after it, the session just ended. Returns
+    None if the calendar cannot be consulted, in which case caches are trusted.
+    """
+    from .calendar import sessions  # imported here to keep the module import light
+
+    try:
+        now = pd.Timestamp.now(tz="America/New_York")
+        # Give the vendor until 18:00 New York before expecting today's close.
+        cutoff = now.normalize() + pd.Timedelta(hours=18)
+        asof = pd.Timestamp(end) if end else (now.normalize() if now >= cutoff else now.normalize() - pd.Timedelta(days=1))
+        recent = sessions(asof - pd.Timedelta(days=10), asof)
+        return recent[-1] if len(recent) else None
+    except Exception:  # a calendar problem must not stop prices loading
+        return None
+
+
 def load_prices(
     tickers: Sequence[str],
     start: str = DEFAULT_START,
@@ -117,6 +138,11 @@ def load_prices(
     tickers = [t.upper() for t in dict.fromkeys(tickers)]  # de-duplicate, keep order
     cache_dir = Path(cache_dir)
 
+    # A cache is only usable if it reaches back far enough *and* comes up to the
+    # latest session that should exist. Without the second check a file written
+    # before today's close is served all day, silently one session short.
+    latest_session = _last_expected_session(end)
+
     cached: dict[str, pd.Series] = {}
     to_fetch: list[str] = []
     for ticker in tickers:
@@ -125,8 +151,9 @@ def load_prices(
             to_fetch.append(ticker)
             continue
         series = pd.read_parquet(path)[ticker]
-        if series.index.min() > pd.Timestamp(start):
-            to_fetch.append(ticker)  # cache doesn't reach far enough back
+        stale = latest_session is not None and series.index.max() < latest_session
+        if series.index.min() > pd.Timestamp(start) or stale:
+            to_fetch.append(ticker)
         else:
             cached[ticker] = series
 
