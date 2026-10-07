@@ -91,7 +91,7 @@ src/riskkit/
 riskkit backtest                      # same numbers, printed
 riskkit report --alpha 0.05           # 95% instead of 99%
 riskkit report --weights mine.yaml    # any portfolio
-pytest                                # 71 tests, no network
+pytest                                # 72 tests, no network
 ```
 
 ## Where it runs
@@ -99,9 +99,10 @@ pytest                                # 71 tests, no network
 The published report uses the demo portfolio, which exists so the models have a realistic multi-asset
 return series to be tested on without anyone's holdings being involved.
 
-I also run it nightly against my own brokerage account, from a private app that feeds it live positions
-and displays the output — forecast against realised losses, which positions drive the risk, how the book
-would have fared through 2008 and 2020. That app is private because it reads a real account; the
+I also run it every weekday evening against my own brokerage account, from a private app that feeds it
+live position weights and displays the output: 95% and 99% VaR and ES, which positions drive the risk,
+whether the day's move broke the previous forecast, and a monthly backtest of the models on those
+holdings. That app is private because it reads a real account; the
 analytics are here because they're general and contain no personal data.
 [Write-up of that side](https://github.com/omar-r21/portfolio-intelligence-case-study), including what it
 replaced: a language model producing buy/sell calls with invented confidence percentages.
